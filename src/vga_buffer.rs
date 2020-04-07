@@ -48,7 +48,7 @@ struct ScreenChar {
 }
 
 const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH: usize = 25;
+const BUFFER_WIDTH: usize = 80;
 
 // Same, we wans to make sure Buffer has the same layout as it's wrapped data
 #[repr(transparent)]
@@ -101,6 +101,24 @@ impl Writer {
     }
 
     fn new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let character = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
+
+    fn clear_row(&mut self, row: usize) {
+        for col in 0..BUFFER_WIDTH {
+            let blank = ScreenChar {
+                ascii_char: b' ',
+                color_code: self.color_code,
+            };
+            self.buffer.chars[row][col].write(blank);
+        }
     }
 
 }
@@ -120,5 +138,7 @@ pub fn print_smth() {
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+    write!(writer, "The numbers are {} and {}\n", 42, 1.0/3.0).unwrap();
+    writeln!(writer, "This is a test of my newline function").unwrap();
+    writeln!(writer, "This is the rest of what I had to say.").unwrap();
 }
