@@ -1,3 +1,12 @@
 [build]
-
 target = "x86_64-os.json"
+
+# For all the targets that target a system where the "os" is "none"
+[target.'cfg(target_os = "none")']
+# Specifies the command to run after a successfull build that was triggered by
+# `cargo run`
+# The command "bootimage runner" gets passed the path to the executable that
+# was built
+# See https://github.com/rust-osdev/bootimage for more info on the
+# `bootimage` command
+runner = "bootimage runner"
