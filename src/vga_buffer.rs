@@ -1,4 +1,5 @@
 use volatile::Volatile;
+use core::fmt;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -104,14 +105,20 @@ impl Writer {
 
 }
 
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
 pub fn print_smth() {
+    use core::fmt::Write;
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    writer.write_byte(b'H');
-    writer.write_string("ello ");
-    writer.write_string("Wörld!");
+    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
 }
