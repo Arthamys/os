@@ -15,7 +15,7 @@ pub extern "C" fn _start() -> ! {
 
     // trigger a breakpoint interrupt
     x86_64::instructions::interrupts::int3();
-    
+
     #[cfg(test)]
     test_main();
 
