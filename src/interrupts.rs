@@ -1,9 +1,18 @@
+use pic8259_simple::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 use lazy_static::lazy_static;
+use spin;
 use crate::println;
 use crate::gdt;
 #[cfg(test)]
 use crate::{serial_print, serial_println};
+
+pub const PIC1_OFFSET : u8 = 32;
+pub const PIC2_OFFSET : u8 = PIC1_OFFSET + 8;
+
+pub static PICS : spin::Mutex<ChainedPics> = spin::Mutex::new(
+    unsafe {ChainedPics::new(PIC1_OFFSET, PIC2_OFFSET)}
+);
 
 lazy_static!{
     static ref IDT: InterruptDescriptorTable = {
@@ -14,7 +23,6 @@ lazy_static!{
       unsafe {
           idt.double_fault.set_handler_fn(double_fault_handler)
               .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
-
       }
       idt
     };
