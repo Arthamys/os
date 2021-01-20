@@ -10,3 +10,10 @@ target = "x86_64-os.json"
 # See https://github.com/rust-osdev/bootimage for more info on the
 # `bootimage` command
 runner = "bootimage runner"
+
+[unstable]
+# Build the `core` and `alloc` crates, as well  as `compiler_builtins`
+# (because it's a dependency of `core`)
+build-std = ["core", "compiler_builtins", "alloc"]
+# Include memory builtins such as `memcpy`, `memset`, `memcmp`
+build-std-features = ["compiler-builtins-mem"]
